@@ -7,15 +7,17 @@ import {
   Param,
   Query,
   Delete,
-  UseInterceptors,
 } from '@nestjs/common';
 import { NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UsersService } from './users.service';
-import { SerializeInterceptor } from '../interceptors/serialize.interceptor';
+import { Serialize } from '../interceptors/serialize.interceptor';
+import { UserDto } from './dtos/user.dto';
 
 @Controller('auth')
+// To hide password from response
+@Serialize(UserDto)
 export class UsersController {
   constructor(private userService: UsersService) {}
   @Post('/signup')
@@ -23,8 +25,6 @@ export class UsersController {
     this.userService.create(body.email, body.password);
   }
 
-  // To hide password from response
-  @UseInterceptors(SerializeInterceptor)
   @Get('/:id')
   async findUser(@Param('id') id: string) {
     const user = await this.userService.findOne(parseInt(id));
